@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>나는 어떤 시민일까</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700;800&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* Layout: 종이 위 한 장짜리 검사지 — 좁은 단일 칼럼, 상단 진행 표시, 결과는 큰 유형 카드 하나 */
+:root {
+  --paper: #F5F0E4;
+  --card: #FCF9F2;
+  --ink: #1E2738;
+  --ink-soft: #545C6B;
+  --line: #DCD2BE;
+  --navy: #24375E;
+  --sage: #557259;
+  --terra: #A85A3B;
+  --gold: #A9822F;
+  --on-accent: #FCF9F2;
+  --grain: rgba(80, 60, 30, .035);
+  --font-display: "Nanum Myeongjo", "Noto Serif KR", "AppleMyungjo", serif;
+  --font-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #141A24; --card: #1C2330; --ink: #ECE6D8; --ink-soft: #B2AEA3; --line: #323B4B;
+    --navy: #93ABD9; --sage: #9EBC9F; --terra: #DF9877; --gold: #D8B562; --on-accent: #141A24;
+    --grain: rgba(255, 240, 210, .025); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #141A24; --card: #1C2330; --ink: #ECE6D8; --ink-soft: #B2AEA3; --line: #323B4B;
+  --navy: #93ABD9; --sage: #9EBC9F; --terra: #DF9877; --gold: #D8B562; --on-accent: #141A24;
+  --grain: rgba(255, 240, 210, .025); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+[hidden] { display: none !important; }
+body {
+  background-color: var(--paper);
+  background-image:
+    repeating-linear-gradient(0deg, var(--grain) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, var(--grain) 0 1px, transparent 1px 4px);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 18px; line-height: 1.75;
+  word-break: keep-all; overflow-wrap: anywhere;
+}
+h1, h2, h3 { font-family: var(--font-display); font-weight: 800; line-height: 1.4; text-wrap: balance; margin: 0; }
+p { margin: 0; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 6px; }
+h1:focus, h2:focus { outline: none; }
+
+.page {
+  max-width: 680px; margin: 0 auto; min-height: 100vh;
+  display: flex; flex-direction: column;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 20px;
+}
+main { flex: 1; }
+.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: var(--paper); padding-block: 14px 12px;
+  border-bottom: 1px solid var(--line);
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+.top-row { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.top .name { font-family: var(--font-display); font-weight: 700; font-size: 15px; color: var(--navy); min-width: 0; }
+.top .count { font-variant-numeric: tabular-nums; font-weight: 600; font-size: 16px; color: var(--navy); flex: none; }
+.bar { height: 4px; border-radius: 2px; background: var(--line); margin-top: 8px; overflow: hidden; }
+.bar span { display: block; height: 100%; background: var(--gold); transition: width .3s ease; }
+
+.screen { padding-top: 34px; display: flex; flex-direction: column; gap: 24px; animation: fade .45s ease both; }
+@keyframes fade { from { opacity: .001; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .screen { animation: none; } .bar span { transition: none; } }
+
+/* 첫 화면 */
+.intro h1 { font-size: clamp(30px, 7vw, 42px); color: var(--navy); }
+.intro .sub { font-size: 17px; color: var(--ink-soft); margin-top: 12px; padding-left: 14px; border-left: 3px solid var(--gold); }
+.story { font-family: var(--font-display); font-size: 19.5px; line-height: 1.95; font-weight: 700; display: flex; flex-direction: column; gap: 10px; }
+.story p:last-child { color: var(--navy); }
+.trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.trio > div { border-top: 3px solid var(--rc); padding-top: 10px; font-size: 15px; color: var(--ink-soft); min-width: 0; }
+.trio b { display: block; font-family: var(--font-display); color: var(--rc); font-size: 17px; }
+@media (max-width: 460px) { .trio { grid-template-columns: 1fr; } }
+
+.t-life { --rc: var(--navy); }
+.t-link { --rc: var(--sage); }
+.t-delib { --rc: var(--terra); }
+
+/* 버튼 */
+.actions { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
+.actions.center { justify-content: center; }
+.btn {
+  font: inherit; font-weight: 600; font-size: 18px;
+  min-height: 56px; padding: 12px 30px; border-radius: 8px;
+  border: 1.5px solid var(--navy); background: var(--navy); color: var(--on-accent);
+  cursor: pointer; transition: transform .15s ease, opacity .15s ease;
+}
+.btn:hover:not(:disabled) { transform: translateY(-1px); }
+.btn:disabled { opacity: .35; cursor: not-allowed; }
+.btn.ghost { background: transparent; color: var(--navy); }
+.btn.wide { width: 100%; }
+
+/* 문항 */
+fieldset { border: 0; padding: 0; margin: 0; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+legend { padding: 0; margin-bottom: 16px; font-family: var(--font-display); font-weight: 800; font-size: clamp(21px, 4.6vw, 25px); line-height: 1.5; text-wrap: balance; }
+legend .qn { display: block; font-family: var(--font-body); font-size: 14px; font-weight: 600; letter-spacing: .08em; color: var(--gold); margin-bottom: 4px; }
+.opt { position: relative; display: flex; gap: 14px; align-items: flex-start; padding: 18px; min-height: 64px; background: var(--card); border: 1.5px solid var(--line); border-radius: 10px; cursor: pointer; transition: border-color .15s, background .15s; }
+.opt:hover { border-color: var(--ink-soft); }
+.opt input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.opt .key { flex: none; width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--line); display: grid; place-items: center; font-weight: 600; font-size: 16px; color: var(--ink-soft); }
+.opt .txt { min-width: 0; padding-top: 2px; }
+.opt:has(input:checked) { border-color: var(--navy); background: color-mix(in srgb, var(--navy) 7%, var(--card)); }
+.opt:has(input:checked) .key { background: var(--navy); border-color: var(--navy); color: var(--on-accent); }
+.opt:has(input:focus-visible) { outline: 3px solid var(--gold); outline-offset: 3px; }
+.hint { font-size: 15px; color: var(--ink-soft); text-align: right; }
+
+/* 결과 */
+.eyebrow { font-size: 14px; font-weight: 600; letter-spacing: .08em; color: var(--ink-soft); }
+.result-head h2 { font-size: clamp(26px, 6vw, 34px); }
+.result-head .lead { color: var(--ink-soft); margin-top: 8px; font-size: 16.5px; }
+.type { border: 2px solid var(--rc); border-radius: 12px; background: var(--card); overflow: hidden; }
+.type .head { background: color-mix(in srgb, var(--rc) 13%, var(--card)); padding: 26px 24px 22px; border-bottom: 1px solid color-mix(in srgb, var(--rc) 30%, transparent); display: flex; gap: 16px; align-items: center; }
+.type .mark { flex: none; width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--rc); color: var(--rc); display: grid; place-items: center; }
+.type .mark svg { width: 28px; height: 28px; }
+.type .tname { font-family: var(--font-display); font-weight: 800; font-size: clamp(30px, 7vw, 40px); color: var(--rc); line-height: 1.2; }
+.type .body { padding: 22px 24px 24px; display: flex; flex-direction: column; gap: 14px; }
+.type .q { font-family: var(--font-display); font-weight: 800; font-size: clamp(20px, 4.6vw, 24px); line-height: 1.5; }
+.type .intro-line { font-size: 17.5px; }
+.type .feat { font-size: 15.5px; color: var(--ink-soft); }
+.type.small .head { padding: 18px 20px; }
+.type.small .tname { font-size: 26px; }
+.type.small .body { padding: 16px 20px 18px; gap: 8px; }
+.type.small .q { font-size: 18.5px; }
+.duo { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.duo.three { grid-template-columns: 1fr; }
+@media (max-width: 560px) { .duo { grid-template-columns: 1fr; } }
+.pick { display: flex; flex-direction: column; gap: 12px; padding: 18px; border: 1px dashed var(--gold); border-radius: 10px; background: color-mix(in srgb, var(--gold) 6%, transparent); }
+.pick p { font-weight: 600; }
+.pick .btns { display: flex; flex-wrap: wrap; gap: 10px; }
+.pick .btn { flex: 1 1 180px; border-color: var(--rc); background: transparent; color: var(--rc); }
+.pick .btn[aria-pressed="true"] { background: var(--rc); color: var(--on-accent); }
+.scores { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 15px; color: var(--ink-soft); }
+.scores b { color: var(--rc); font-variant-numeric: tabular-nums; }
+.notice { font-size: 16px; line-height: 1.85; color: var(--ink-soft); padding: 16px 18px; border-left: 3px solid var(--gold); background: var(--card); border-radius: 0 8px 8px 0; }
+.call { font-family: var(--font-display); font-weight: 800; font-size: clamp(21px, 5vw, 26px); line-height: 1.6; text-align: center; color: var(--navy); padding: 26px 8px; border-block: 1.5px solid var(--line); text-wrap: balance; }
+.foot { text-align: center; font-size: 13px; color: var(--ink-soft); padding-top: 40px; }
+</style>
+
+</head>
+<body>
+<div class="page">
+  <header class="top" id="top" hidden>
+    <div class="top-row">
+      <span class="name">중앙대학교 빈 강의실, 나는 어떤 시민일까?</span>
+      <span class="count" id="count" aria-live="polite"></span>
+    </div>
+    <div class="bar" aria-hidden="true"><span id="bar" style="width:0"></span></div>
+  </header>
+  <main id="app"></main>
+  <p class="foot">시민참여교육을 위한 가상 활동입니다.</p>
+</div>
+
+<script>
+(function () {
+  var TYPES = {
+    life: { name: "생활권 시민", q: "“그래서 누가, 얼마나 편해지는가?”", feat: "학생들의 실제 생활, 이용 편의, 학습 환경을 먼저 살핍니다.", line: "“나는 일상에서 실제로 필요한 것이 무엇인지 먼저 생각하는 시민입니다.”" },
+    link: { name: "연결 시민", q: "“이 결정에 빠진 목소리는 없는가?”", feat: "관계, 돌봄, 소외되지 않는 사람, 공동체성을 먼저 살핍니다.", line: "“나는 모두가 함께 이용하고 소외되지 않는 방법을 먼저 생각하는 시민입니다.”" },
+    delib: { name: "숙의 시민", q: "“이 결정은 근거 있고 공정한가?”", feat: "자료, 예산, 절차, 투명성을 먼저 살핍니다.", line: "“나는 충분한 정보와 공정한 결정 과정이 있는지 먼저 생각하는 시민입니다.”" }
+  };
+  var KEYS = ["life", "link", "delib"];
+  var ICON = {
+    life: '<path d="M12 6.5C10.5 5.3 8.2 4.8 4 5v13c4.2-.2 6.5.3 8 1.5 1.5-1.2 3.8-1.7 8-1.5V5c-4.2-.2-6.5.3-8 1.5Zm0 0V19.5"/>',
+    link: '<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9.5" r="2.4"/><path d="M3.5 20c0-3.3 2.5-6 5.5-6s5.5 2.7 5.5 6M15 14.5c3 0 5.5 2.2 5.5 5.5"/>',
+    delib: '<path d="M6 3h8l4 4v14H6zM14 3v4h4M9 11.5h6M9 14.5h6M9 17.5h4"/>'
+  };
+  var QS = [
+    { q: "중앙대학교의 빈 강의실을 발견했을 때 가장 먼저 드는 생각은?", o: ["시험기간에 공부할 조용한 공간이 더 필요하다.", "혼자 쉬거나 사람들과 편하게 머무를 공간이 있으면 좋겠다.", "현재 공간이 얼마나 부족한지 먼저 조사해야겠다."] },
+    { q: "중앙대학교 시설을 바꿀 때 가장 중요하다고 생각하는 기준은?", o: ["실제 이용자가 얼마나 자주, 편하게 사용할 수 있는가", "다양한 사람이 배제되지 않고 함께 사용할 수 있는가", "예산과 절차가 투명하고 공정한가"] },
+    { q: "친구가 “온라인 투표로 빨리 정하자”고 말한다면?", o: ["많은 학생이 참여할 수 있다면 괜찮다고 생각한다.", "온라인 투표에 참여하기 어려운 사람도 있을 수 있어 걱정된다.", "투표 전에 선택지와 근거가 충분히 제공되어야 한다고 생각한다."] },
+    { q: "공간을 가장 우선적으로 고려해야 할 사람은 누구라고 생각해?", o: ["매일 중앙대학교를 이용하는 학생", "공간이 부족하거나 소외되기 쉬운 사람까지 포함한 모두", "조사 결과 가장 필요도가 높은 집단"] },
+    { q: "중앙대학교 인근 주민이 공간을 함께 쓰고 싶다고 요청한다면?", o: ["학생 이용에 방해가 없다면 일부 시간에는 가능하다.", "지역주민과 학생이 만나는 기회가 될 수 있어 적극 검토해야 한다.", "안전, 관리 비용, 이용 규칙을 검토한 뒤 결정해야 한다."] },
+    { q: "좋은 결정이란 무엇이라고 생각해?", o: ["학생들의 실제 생활이 더 편해지는 결정", "서로 다른 사람들이 납득하고 함께 살아갈 수 있는 결정", "충분한 정보와 공정한 절차를 거친 결정"] }
+  ];
+  var N = QS.length;
+  var state = { stage: "intro", i: 0, answers: new Array(N).fill(null), picked: null };
+  var app = document.getElementById("app");
+  var top = document.getElementById("top");
+  var countEl = document.getElementById("count");
+  var barEl = document.getElementById("bar");
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function icon(k) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICON[k] + '</svg>'; }
+  function focusTitle() {
+    window.scrollTo(0, 0);
+    var t = document.getElementById("screen-title");
+    if (t) t.focus({ preventScroll: true });
+  }
+
+  function typeCard(k, small) {
+    var T = TYPES[k];
+    return '<article class="type t-' + k + (small ? ' small' : '') + '">' +
+      '<div class="head"><span class="mark">' + icon(k) + '</span><div class="tname">' + T.name + '</div></div>' +
+      '<div class="body"><p class="q">' + T.q + '</p><p class="intro-line">' + T.line + '</p><p class="feat">' + T.feat + '</p></div>' +
+      '</article>';
+  }
+
+  function renderIntro() {
+    top.hidden = true;
+    app.innerHTML =
+      '<section class="screen intro">' +
+        '<div><h1 id="screen-title" tabindex="-1">중앙대학교 빈 강의실,<br>나는 어떤 시민일까?</h1>' +
+        '<p class="sub">정답을 고르는 검사가 아니라, 내가 어떤 가치를 먼저 살피는지 알아보는 활동입니다.</p></div>' +
+        '<div class="story"><p>중앙대학교 캠퍼스에 활용 방안을 정해야 하는 빈 강의실이 있습니다.</p>' +
+        '<p>누군가는 조용한 자습실을, 누군가는 학생 휴게공간을, 또 다른 누군가는 지역과 함께 쓰는 문화공간을 원합니다.</p>' +
+        '<p>당신은 이 문제를 어떤 관점에서 바라볼까요?</p></div>' +
+        '<div class="trio">' + KEYS.map(function (k) { return '<div class="t-' + k + '"><b>' + TYPES[k].name + '</b>' + TYPES[k].q + '</div>'; }).join("") + '</div>' +
+        '<div class="actions"><button class="btn wide" id="start">검사 시작하기</button></div>' +
+      '</section>';
+    document.getElementById("start").onclick = function () { state.stage = "quiz"; state.i = 0; render(true); };
+  }
+
+  function renderQuiz() {
+    var i = state.i, Q = QS[i], val = state.answers[i];
+    top.hidden = false;
+    countEl.textContent = (i + 1) + " / " + N;
+    barEl.style.width = ((i + 1) / N * 100) + "%";
+    var last = i === N - 1;
+    app.innerHTML =
+      '<section class="screen">' +
+        '<fieldset><legend id="screen-title" tabindex="-1"><span class="qn">Q' + (i + 1) + '</span>' + esc(Q.q) + '</legend>' +
+        Q.o.map(function (t, k) {
+          return '<label class="opt"><input type="radio" name="q' + i + '" id="q' + i + '-' + k + '" value="' + k + '"' + (val === k ? ' checked' : '') + '>' +
+            '<span class="key" aria-hidden="true">' + "ABC"[k] + '</span><span class="txt">' + esc(t) + '</span></label>';
+        }).join("") +
+        '</fieldset>' +
+        '<div class="actions"><button class="btn" id="next"' + (val === null ? ' disabled' : '') + '>' + (last ? "나의 시민 유형 확인하기" : "다음") + '</button></div>' +
+        '<p class="hint" id="hint"' + (val === null ? '' : ' hidden') + '>답을 하나 고르면 다음으로 넘어갈 수 있습니다.</p>' +
+      '</section>';
+    app.querySelectorAll('input[type="radio"]').forEach(function (r) {
+      r.addEventListener("change", function () {
+        state.answers[i] = Number(r.value);
+        document.getElementById("next").disabled = false;
+        document.getElementById("hint").hidden = true;
+      });
+    });
+    document.getElementById("next").onclick = function () {
+      if (state.answers[i] === null) return;
+      if (last) { state.stage = "result"; state.picked = null; }
+      else state.i = i + 1;
+      render(true);
+    };
+  }
+
+  function scores() {
+    var s = { life: 0, link: 0, delib: 0 };
+    state.answers.forEach(function (a) { if (a !== null) s[KEYS[a]]++; });
+    return s;
+  }
+
+  function renderResult(keepFocus) {
+    var s = scores();
+    var max = Math.max(s.life, s.link, s.delib);
+    var tops = KEYS.filter(function (k) { return s[k] === max; });
+    var tie = tops.length > 1;
+    top.hidden = false;
+    countEl.textContent = "결과";
+    barEl.style.width = "100%";
+
+    var head, body;
+    if (!tie) {
+      head = '<p class="eyebrow">나의 시민 유형</p><h2 id="screen-title" tabindex="-1">당신은 <span style="color:var(--' + { life: "navy", link: "sage", delib: "terra" }[tops[0]] + ')">' + TYPES[tops[0]].name + '</span>입니다</h2>';
+      body = typeCard(tops[0], false);
+    } else {
+      var word = tops.length === 2 ? "두" : "세";
+      head = '<p class="eyebrow">나의 시민 유형</p><h2 id="screen-title" tabindex="-1">당신은 복합 시민입니다</h2>' +
+        '<p class="lead">' + tops.map(function (k) { return TYPES[k].name; }).join(", ") + '의 관점을 같은 무게로 함께 살폈습니다.</p>';
+      body = (state.picked ? typeCard(state.picked, false) : '') +
+        '<div class="duo' + (tops.length === 3 ? ' three' : '') + '">' + tops.filter(function (k) { return k !== state.picked; }).map(function (k) { return typeCard(k, true); }).join("") + '</div>' +
+        '<div class="pick"><p>' + word + ' 관점 중 오늘 모둠 활동에서 더 이야기해 보고 싶은 유형을 선택하세요</p><div class="btns">' +
+        tops.map(function (k) { return '<button class="btn t-' + k + '" data-pick="' + k + '" aria-pressed="' + (state.picked === k) + '">' + TYPES[k].name + '</button>'; }).join("") +
+        '</div></div>';
+    }
+
+    app.innerHTML =
+      '<section class="screen">' +
+        '<div class="result-head">' + head + '<p class="lead">결과는 우열이나 평가가 아니라, 같은 문제를 바라보는 관점의 차이입니다.</p></div>' +
+        body +
+        '<div class="scores">' + KEYS.map(function (k) { return '<span class="t-' + k + '">' + TYPES[k].name + ' <b>' + s[k] + '</b></span>'; }).join("") + '</div>' +
+        '<p class="notice">이 유형은 당신의 정답이나 정치적 입장을 뜻하지 않습니다.<br>시민참여는 서로 다른 관점을 가진 사람들이, 다른 목소리와 정보를 들으며 더 나은 결정을 함께 만들어 가는 과정입니다.</p>' +
+        '<p class="call">같은 유형의 사람들과 모여, 중앙대학교 빈 강의실 활용 방안에 대한 우리 모둠의 의견을 한 줄로 적어 보세요.</p>' +
+        '<div class="actions center"><button class="btn ghost" id="retry">다시 검사하기</button></div>' +
+      '</section>';
+
+    app.querySelectorAll("[data-pick]").forEach(function (b) {
+      b.onclick = function () {
+        state.picked = b.getAttribute("data-pick");
+        renderResult(true);
+        var again = app.querySelector('[data-pick="' + state.picked + '"]');
+        if (again) again.focus();
+      };
+    });
+    document.getElementById("retry").onclick = function () {
+      state = { stage: "intro", i: 0, answers: new Array(N).fill(null), picked: null };
+      render(true);
+    };
+    if (keepFocus) { var sc = app.querySelector(".screen"); if (sc) sc.style.animation = "none"; }
+  }
+
+  function render(moveFocus) {
+    if (state.stage === "quiz") renderQuiz();
+    else if (state.stage === "result") renderResult(false);
+    else renderIntro();
+    if (moveFocus) focusTitle();
+  }
+  render(false);
+})();
+</script>
+</body>
+</html>
